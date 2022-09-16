@@ -2,9 +2,9 @@
 
 namespace Foxws\MediaUtils\Tests;
 
+use Foxws\MediaUtils\MediaUtilsServiceProvider;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Orchestra\Testbench\TestCase as Orchestra;
-use Foxws\MediaUtils\MediaUtilsServiceProvider;
 
 class TestCase extends Orchestra
 {

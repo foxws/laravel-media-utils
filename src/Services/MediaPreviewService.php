@@ -39,8 +39,7 @@ class MediaPreviewService
         string $path,
         TemporaryDirectory $temporaryDirectory,
         Collection $clips,
-    ): string
-    {
+    ): string {
         $destination = $temporaryDirectory->path('preview.mp4');
 
         $ffmpeg = FFMpegService::create();

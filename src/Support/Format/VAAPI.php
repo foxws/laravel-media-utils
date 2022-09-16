@@ -29,7 +29,6 @@ class VAAPI extends DefaultVideo
 
     /**
      * @param $support
-     *
      * @return VAAPI
      */
     public function setBFramesSupport($support)
@@ -57,7 +56,6 @@ class VAAPI extends DefaultVideo
 
     /**
      * @param $passes
-     *
      * @return VAAPI
      */
     public function setPasses($passes)
