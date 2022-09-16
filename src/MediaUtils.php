@@ -4,4 +4,5 @@ namespace Foxws\MediaUtils;
 
 class MediaUtils
 {
+
 }
