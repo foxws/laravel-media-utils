@@ -16,3 +16,4 @@ class FFMpegService
             'temporary_directory' => config('media-utils.temporary_directory'),
         ]);
     }
+}
