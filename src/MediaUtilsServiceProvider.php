@@ -17,9 +17,12 @@ class MediaUtilsServiceProvider extends PackageServiceProvider
          */
         $package
             ->name('laravel-media-utils')
-            ->hasConfigFile()
-            ->hasViews()
-            ->hasMigration('create_laravel-media-utils_table')
-            ->hasCommand(MediaUtilsCommand::class);
+            ->hasConfigFile();
+    }
+
+    public function packageRegistered(): void
+    {
+        $this->app->singleton(MediaUtils::class, fn () => new MediaUtils());
+        $this->app->bind('media-utils', MediaUtils::class);
     }
 }
