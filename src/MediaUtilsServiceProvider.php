@@ -2,7 +2,6 @@
 
 namespace Foxws\MediaUtils;
 
-use Foxws\MediaUtils\Commands\MediaUtilsCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
