@@ -3,16 +3,69 @@
 return [
     /*
     |--------------------------------------------------------------------------
-    | Conversions Queue
+    | FFMpeg
     |--------------------------------------------------------------------------
     |
-    | This controls the conversion queue.
+    | This controls the ffmpeg configuration.
     |
     */
 
-    'connection' => null,
+    'ffmpeg' => [
+        'binaries' => env('FFMPEG_BINARIES', 'ffmpeg'),
 
-    'queue' => null,
+        'threads' => 12,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | FFProbe
+    |--------------------------------------------------------------------------
+    |
+    | This controls the ffprobe configuration.
+    |
+    */
+
+    'ffprobe' => [
+        'binaries' => env('FFPROBE_BINARIES', 'ffprobe'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | FFProbe
+    |--------------------------------------------------------------------------
+    |
+    | This controls the ffmpeg timeout.
+    |
+    */
+    'timeout' => 3600,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Temporary path
+    |--------------------------------------------------------------------------
+    |
+    | This controls the temporary path.
+    |
+    */
+
+    'temporary_directory' => env('FFMPEG_TEMPORARY_DIRECTORY', sys_get_temp_dir()),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Thumbnail
+    |--------------------------------------------------------------------------
+    |
+    | This controls the thumbnail conversion.
+    |
+    */
+
+    'thumbnail' => [
+        'filename' => 'frame.jpg',
+
+        'width' => 320,
+
+        'height' => 240,
+    ],
 
     /*
     |--------------------------------------------------------------------------
@@ -24,15 +77,14 @@ return [
     */
 
     'preview' => [
-        'bitrate' => 1000,
+        'bitrate' => 1500,
 
         'amount' => 10,
 
         'duration' => 1,
 
-        'parameters' => [
-            '-vf', 'hwupload,scale_vaapi=w=320:h=240:format=nv12',
-            '-an',
-        ],
+        'width' => 320,
+
+        'height' => 240,
     ],
 ];

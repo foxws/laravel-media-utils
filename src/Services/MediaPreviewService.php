@@ -2,52 +2,53 @@
 
 namespace Foxws\MediaUtils\Services;
 
+use FFMpeg\Coordinate\Dimension;
 use FFMpeg\Coordinate\TimeCode;
-use FFMpeg\Filters\Video\ClipFilter;
+use FFMpeg\Filters\Video\ResizeFilter;
+use FFMpeg\Format\Video\X264;
 use FFMpeg\Media\Video;
-use Foxws\MediaUtils\Conversions\Conversion;
 use Illuminate\Support\Collection;
 use Spatie\TemporaryDirectory\TemporaryDirectory;
 
 class MediaPreviewService
 {
     public function __construct(
-        protected MediaMetadataService $mediaMetadataService,
+        protected MediaMetadataService $metadataService,
     ) {
     }
 
-    public function create(Conversion $conversion): string
+    public function create(string $path): string
     {
-        $duration = $this->mediaMetadataService->getDuration($conversion->path);
+        $duration = $this->getDuration($path);
 
         $segments = $this->getSegments($duration);
 
-        $temporaryDirectory = (new TemporaryDirectory())->create();
+        $tmp = (new TemporaryDirectory())->create();
 
-        $clips = collect($segments)->map(function (float $segment) use ($conversion, $temporaryDirectory) {
-            $destination = $temporaryDirectory->path("clip_{$segment}.mp4");
+        $clips = collect($segments)->map(function (float $segment) use ($path, $tmp) {
+            $destination = $tmp->path("clip_{$segment}.mp4");
 
-            $this->writeClip($conversion->path, $destination, $segment);
+            $this->writeClip($path, $destination, $segment);
 
             return $destination;
         });
 
-        return $this->concatClips($conversion->path, $temporaryDirectory, $clips);
+        return $this->concatClips($path, $tmp, $clips);
     }
 
     protected function concatClips(
         string $path,
-        TemporaryDirectory $temporaryDirectory,
+        TemporaryDirectory $tmp,
         Collection $clips,
     ): string {
-        $destination = $temporaryDirectory->path('preview.mp4');
+        $destination = $tmp->path('preview.mp4');
 
         $ffmpeg = FFMpegService::create();
 
         $video = $ffmpeg->open($path);
 
         $video
-            ->concat($clips->toArray())
+            ->concat($clips->all())
             ->saveFromSameCodecs($destination, true);
 
         return $destination;
@@ -60,19 +61,23 @@ class MediaPreviewService
     ): Video {
         $ffmpeg = FFMpegService::create();
 
-        $format = FFMpegService::vaapiFormat();
-
-        $format
-            ->setAdditionalParameters(config('media-utils.preview.parameters'))
-            ->setKiloBitrate(config('media-utils.preview.bitrate'));
-
         $video = $ffmpeg->open($path);
 
-        $clip = $video
-            ->addFilter(new ClipFilter(
-                TimeCode::fromSeconds($start),
-                TimeCode::fromSeconds(config('media-utils.preview.duration'))
-            ));
+        $format = (new X264())
+            ->setKiloBitrate(config('media-utils.preview.bitrate'))
+            ->setAudioCodec('copy')
+            ->setAdditionalParameters(['-an']);
+
+        $clip = $video->clip(
+            TimeCode::fromSeconds($start),
+            TimeCode::fromSeconds(config('media-utils.preview.duration'))
+        );
+
+        $clip->filters()->resize(
+            dimension: new Dimension(config('media-utils.preview.width'), config('media-utils.preview.height')),
+            mode: ResizeFilter::RESIZEMODE_INSET,
+            forceStandards: true
+        );
 
         return $clip->save($format, $destination);
     }
@@ -88,5 +93,12 @@ class MediaPreviewService
         array_pop($segments);
 
         return $segments;
+    }
+
+    protected function getDuration(string $path): float
+    {
+        $format = $this->metadataService->getFormat($path);
+
+        return $format->get('duration', 0);
     }
 }

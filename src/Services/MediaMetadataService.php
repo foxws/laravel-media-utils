@@ -3,17 +3,11 @@
 namespace Foxws\MediaUtils\Services;
 
 use FFMpeg\FFProbe\DataMapping\Format;
+use FFMpeg\FFProbe\DataMapping\Stream;
 use FFMpeg\FFProbe\DataMapping\StreamCollection;
 
 class MediaMetadataService
 {
-    public function getDuration(string $path): float
-    {
-        $format = $this->getFormat($path);
-
-        return $format->get('duration', 0);
-    }
-
     public function getFormat(string $path): Format
     {
         $ffprobe = FFProbeService::create();
@@ -26,6 +20,16 @@ class MediaMetadataService
         $ffprobe = FFProbeService::create();
 
         return $ffprobe->streams($path);
+    }
+
+    public function getFirstAudio(string $path): ?Stream
+    {
+        return $this->getSteams($path)->audios()->first();
+    }
+
+    public function getFirstVideo(string $path): ?Stream
+    {
+        return $this->getSteams($path)->videos()->first();
     }
 
     public function isValid(string $path): bool
