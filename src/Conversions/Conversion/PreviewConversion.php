@@ -24,25 +24,25 @@ class PreviewConversion extends Conversion
         $this->performConversion($tmp);
 
         return $this;
-   }
+    }
 
     protected function performConversion(TemporaryDirectory $tmp): void
     {
-            $ffmpeg = $this->ffmpeg();
+        $ffmpeg = $this->ffmpeg();
 
-            $video = $ffmpeg->open($this->file);
+        $video = $ffmpeg->open($this->file);
 
-            throw_if(! $video instanceof Video);
+        throw_if(! $video instanceof Video);
 
-            $duration = $ffmpeg->getFFProbe()->format($this->file)->get('duration');
+        $duration = $ffmpeg->getFFProbe()->format($this->file)->get('duration');
 
-            $segments = $this->segments($duration);
+        $segments = $this->segments($duration);
 
-            $clips = $segments->map(fn (float $segment) => $this->clip($video, $segment, $tmp));
+        $clips = $segments->map(fn (float $segment) => $this->clip($video, $segment, $tmp));
 
-            $video
-                ->concat($clips->all())
-                ->saveFromSameCodecs($this->path, true);
+        $video
+            ->concat($clips->all())
+            ->saveFromSameCodecs($this->path, true);
     }
 
     protected function clip(Video $video, float $segment, TemporaryDirectory $tmp): string

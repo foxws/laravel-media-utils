@@ -8,7 +8,7 @@ use Spatie\TemporaryDirectory\TemporaryDirectory;
 
 abstract class Conversion extends Fluent
 {
-    abstract function convert(string $file): self;
+    abstract public function convert(string $file): self;
 
     protected function ffmpeg(): FFMpeg
     {
