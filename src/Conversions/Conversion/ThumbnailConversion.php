@@ -46,7 +46,7 @@ class ThumbnailConversion extends Conversion
             ->save($this->path);
     }
 
-    public function extractFrameAt(float $seconds = 0): self
+    public function extractFrameAt(?float $seconds = null): self
     {
         $this->frameAt = $seconds;
 
