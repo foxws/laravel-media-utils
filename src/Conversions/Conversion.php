@@ -1,12 +1,16 @@
 <?php
 
-namespace Foxws\MediaUtils\Services;
+namespace Foxws\MediaUtils\Conversions;
 
 use FFMpeg\FFMpeg;
+use Illuminate\Support\Fluent;
+use Spatie\TemporaryDirectory\TemporaryDirectory;
 
-class FFMpegService
+abstract class Conversion extends Fluent
 {
-    public static function create(): FFMpeg
+    abstract function convert(string $file): self;
+
+    protected function ffmpeg(): FFMpeg
     {
         return FFMpeg::create([
             'ffmpeg.binaries' => config('media-utils.ffmpeg.binaries'),
@@ -15,5 +19,10 @@ class FFMpegService
             'ffmpeg.threads' => config('media-utils.ffmpeg.threads', 12),
             'temporary_directory' => config('media-utils.temporary_directory'),
         ]);
+    }
+
+    protected function temporaryDirectory(): TemporaryDirectory
+    {
+        return (new TemporaryDirectory())->create();
     }
 }
