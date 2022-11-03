@@ -80,7 +80,7 @@ return [
     'preview' => [
         'bitrate' => 1500,
 
-        'amount' => 10,
+        'amount' => 12,
 
         'duration' => 1,
 
